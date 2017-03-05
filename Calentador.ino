@@ -3,10 +3,6 @@
 /*
  *  Nokia 3310/5110, 84x48 pixel monochrome LCD display.
  */
-
-//#include <SPI.h>
-//#include <Adafruit_GFX.h>
-//#include <Adafruit_PCD8544.h>
 #include <MenuPCD8544.h>
 #include <AnalogKeyPad.h>
 #include <PID_v1.h>
@@ -35,6 +31,7 @@ extern double setPoint;
 
 extern bool itsRun;
 extern bool itsCancel;
+extern bool waitAHitToUpdate;
 
 void printPrincipal();
 
@@ -135,51 +132,63 @@ void loop()
   }
   else
   {
-    if( !showMenuFlag )
+    if( !waitAHitToUpdate )
     {
-      if( keypad.keyUpEvent() != AnalogKeyPad::NO_KEY )
+      if( !showMenuFlag )
       {
-        if( (keypad.getCurrentKey() == AnalogKeyPad::UP ) && !itsCancel )
+        if( keypad.keyUpEvent() != AnalogKeyPad::NO_KEY )
         {
-          runPauseProcess();
-          //showMenuFlag = false;
-          printPrincipal();
+          if(backLightMode==2)
+            counter = millis();
+          if( (keypad.getCurrentKey() == AnalogKeyPad::UP ) && !itsCancel )
+          {
+            runPauseProcess();
+            printPrincipal();
+          }
+          if( keypad.getCurrentKey() == AnalogKeyPad::SELECT )
+          {
+            tone(ALARMSOUNDPIN, 200, 200);
+            delay(100);
+            tone(ALARMSOUNDPIN, 440, 300);
+            delay(100);
+            noTone(ALARMSOUNDPIN);
+
+            lcd.clearDisplay();
+
+            showMenuFlag = true;
+            menuMain.begin(&lcd);
+          }
         }
-        if( keypad.getCurrentKey() == AnalogKeyPad::SELECT )
+      }
+      else
+      {
+        selection = taskMenu();             // run the menu task
+        if ( selection != NULL )            // menu item selected?
         {
+          showMenuFlag = false;
+          (*selection)();                   // then execute it
+
+          if( !waitAHitToUpdate )
+          {
+            printPrincipal();
+          }
+
+          tone(ALARMSOUNDPIN, 480, 300);
+          delay(100);
           tone(ALARMSOUNDPIN, 200, 200);
           delay(100);
-          tone(ALARMSOUNDPIN, 440, 300);
-          delay(100);
           noTone(ALARMSOUNDPIN);
-
-          lcd.clearDisplay();
-
-          showMenuFlag = true;
-          menuMain.begin(&lcd);
         }
       }
     }
-
     else
-    {
-      selection = taskMenu();                         // run the menu task
-      if ( selection != NULL )                        // menu item selected?
+      if( keypad.keyUpEvent() != AnalogKeyPad::NO_KEY )
       {
-        showMenuFlag = false;
-        (*selection)();                             // then execute it
-
+        waitAHitToUpdate = false;
         printPrincipal();
-
-        tone(ALARMSOUNDPIN, 480, 300);
-        delay(100);
-        tone(ALARMSOUNDPIN, 200, 200);
-        delay(100);
-        noTone(ALARMSOUNDPIN);
       }
-    }
   }
-
+  
   if( (backLightMode==2) &&  ((millis()-counter) > autoOffValue) )
   {
     digitalWrite(BACKLIGHTPIN, LOW);
@@ -228,8 +237,9 @@ menuFunc_t taskMenu()
 void printPrincipal()
 {
     lcd.clearDisplay();
+    lcd.setTextSize(1);
+    lcd.setTextColor(BLACK, WHITE);
 
-    lcd.setCursor(0, 0);
     if( !itsCancel )
     {
       lcd.print("Setpoint= ");

@@ -111,7 +111,7 @@ const menuItem_t menuMainItems[NUM_MAIN_MENU_ITEMS] PROGMEM =
 };
 
 // top level menu node: it consist of the number of items in the menu
-//                      and a pointer to the array of menu items 
+//                      and a pointer to the array of menu items
 const menu_t menuRoot PROGMEM =
 { NUM_MAIN_MENU_ITEMS, menuMainItems };
 
@@ -138,6 +138,7 @@ OvenControl calentador = OvenControl(THERMOCOUPLEPIN, ZEROCROSSPIN, PWMOUTPUTPIN
 
 bool itsRun= false;
 bool itsCancel= true;
+bool waitAHitToUpdate= false;
 
 void backLightOnFun()
 {
@@ -162,16 +163,16 @@ void automaticFun()
 void setAutoOffFun()
 {
     uint16_t autoAux = autoOffValue/1000;
-    
+
     lcd.clearDisplay();
     lcd.drawRect(1, 5, 83, 33,BLACK);
     lcd.setCursor(64, 18);
     lcd.print("SEG");
     setStatus("Setting AuOff");
-    
+
     autoAux = getValue(autoAux, 5, 12, 3);
     autoOffValue = autoAux*1000;
-    
+
     automaticFun();
 }
 void t1Yt2Fun()
@@ -198,34 +199,34 @@ void valoresTempFun()
     lcd.setTextSize(2);
     lcd.setCursor(59, 10);
     lcd.print((char)248);
-    lcd.print("C");    
-    
+    lcd.print("C");
+
     printTempf(tempLimit1, 5, 12, 3);
-    
+
     alarmEnabled?setStatus("Alarm is ON"):setStatus("Alarm is OFF");
     lcd.display();
-    
+
     while( (keyCode = keypad.keyUpEvent()) == AnalogKeyPad::NO_KEY );
-    
-    lcd.setTextSize(1); 
+
+    lcd.setTextSize(1);
     lcd.clearDisplay();
 }
 void setSetpoint()
 {
     lcd.clearDisplay();
-    
+
     setStatus("Set SetPoint");
-    
+
     lcd.drawRect(1, 5, 83, 33,BLACK);
-    lcd.setCursor(64, 18);                
+    lcd.setCursor(64, 18);
     lcd.print((char)248);
-    lcd.setTextSize(2); 
+    lcd.setTextSize(2);
     lcd.print("C");
-    
+
     setPoint= (uint16_t) getValue(setPoint, 5, 12, 3);
-    
+
     lcd.display();
-    
+
     itsRun = true;
     itsCancel = false;
 }
@@ -331,7 +332,8 @@ void acercaDeFun()
     lcd.setCursor(12, 18);
     lcd.print("Favio");
     lcd.display();
-    while( keypad.keyUpEvent() == AnalogKeyPad::NO_KEY );
+    //while( keypad.keyUpEvent() == AnalogKeyPad::NO_KEY );
+    waitAHitToUpdate = true;
     lcd.clearDisplay();
     lcd.setTextSize(1);
     lcd.setTextColor(BLACK, WHITE);
@@ -340,7 +342,7 @@ void acercaDeFun()
 void setTemp(uint8_t setTempFlag)
 {
     uint16_t tempAux;
-    
+
     lcd.clearDisplay();
     switch(setTempFlag)
     {
@@ -353,15 +355,15 @@ void setTemp(uint8_t setTempFlag)
                 tempAux = (uint16_t)tempLimit2;
                 break;
     }
-        
+
     lcd.drawRect(1, 5, 83, 33,BLACK);
-    lcd.setCursor(64, 18);                
+    lcd.setCursor(64, 18);
     lcd.print((char)248);
-    lcd.setTextSize(2); 
+    lcd.setTextSize(2);
     lcd.print("C");
-    
+
     tempAux = (uint16_t) getValue(tempAux, 5, 12, 3);
-    
+
     switch(setTempFlag)
     {
         case 1:
@@ -371,7 +373,7 @@ void setTemp(uint8_t setTempFlag)
                 tempLimit2 = tempAux;
                 break;
     }
-    
+
     lcd.display();
 }
 uint16_t getValue(uint16_t value, uint8_t sCursorX, uint8_t sCursory, uint8_t sTextSize)
@@ -379,11 +381,11 @@ uint16_t getValue(uint16_t value, uint8_t sCursorX, uint8_t sCursory, uint8_t sT
     uint8_t keyCode;
     uint8_t num[3];
     uint8_t posX = 0;
-    
+
     num[0] = (uint8_t)(value/100);
     num[1] = (uint8_t)((value%100)/10);
     num[2] = (uint8_t)(value%10);
-    
+
     lcd.setTextSize(sTextSize);
     while( keyCode != AnalogKeyPad::SELECT )
     {
@@ -432,7 +434,7 @@ uint16_t getValue(uint16_t value, uint8_t sCursorX, uint8_t sCursory, uint8_t sT
     lcd.setTextSize(1);
     lcd.setTextColor(BLACK, WHITE);
     lcd.clearDisplay();
-    
+
     value = (uint16_t)(100*num[0]+10*num[1]+num[2]);
     return value;
 }
@@ -470,7 +472,7 @@ void setStatus(const char *status)
   lcd.setCursor(0,40);
   lcd.setTextColor(WHITE, BLACK);
   lcd.print(status);
-  for(int i=0; i<13-strlen(status); i++)
+  for(uint8_t i=0; i<13-strlen(status); i++)
     lcd.print(" ");
   lcd.display();
   lcd.setTextColor(BLACK, WHITE);
