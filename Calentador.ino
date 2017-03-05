@@ -1,8 +1,8 @@
-#include <Arduino.h>
-
 /*
  *  Nokia 3310/5110, 84x48 pixel monochrome LCD display.
  */
+
+#include <Arduino.h>
 #include <MenuPCD8544.h>
 #include <AnalogKeyPad.h>
 #include <PID_v1.h>
@@ -188,7 +188,7 @@ void loop()
         printPrincipal();
       }
   }
-  
+
   if( (backLightMode==2) &&  ((millis()-counter) > autoOffValue) )
   {
     digitalWrite(BACKLIGHTPIN, LOW);
