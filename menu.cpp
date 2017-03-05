@@ -206,13 +206,16 @@ void valoresTempFun()
     alarmEnabled?setStatus("Alarm is ON"):setStatus("Alarm is OFF");
     lcd.display();
 
-    while( (keyCode = keypad.keyUpEvent()) == AnalogKeyPad::NO_KEY );
+    waitAHitToUpdate = true;
 
     lcd.setTextSize(1);
     lcd.clearDisplay();
 }
 void setSetpoint()
 {
+    if(itsRun)
+      runProcess(false);
+
     lcd.clearDisplay();
 
     setStatus("Set SetPoint");
@@ -230,17 +233,20 @@ void setSetpoint()
     itsRun = true;
     itsCancel = false;
 }
+void runProcess(bool run_status)
+{
+    itsRun = run_status;
+    calentador.setTurnOnHeater(run_status);
+    itsCancel = false;
+}
 void runPauseProcess()
 {
-    if(itsRun){
-        itsRun = false;
-        calentador.setTurnOnHeater(false);
-    }
-    else{
-        itsRun = true;
-        calentador.setTurnOnHeater(true);
-    }
-    itsCancel = false;
+  if(itsRun){
+    runProcess(false);
+  }
+  else{
+    runProcess(true);
+  }
 }
 void cancelProcess()
 {
@@ -267,7 +273,7 @@ void enableAlarmFun()
                 break;
     }
     lcd.display();
-    while( keypad.keyUpEvent() == AnalogKeyPad::NO_KEY );
+    waitAHitToUpdate = true;
     lcd.clearDisplay();
     lcd.setTextSize(1);
 }
@@ -332,7 +338,6 @@ void acercaDeFun()
     lcd.setCursor(12, 18);
     lcd.print("Favio");
     lcd.display();
-    //while( keypad.keyUpEvent() == AnalogKeyPad::NO_KEY );
     waitAHitToUpdate = true;
     lcd.clearDisplay();
     lcd.setTextSize(1);
@@ -399,7 +404,7 @@ uint16_t getValue(uint16_t value, uint8_t sCursorX, uint8_t sCursory, uint8_t sT
             lcd.print(num[i]);
         }
         lcd.display();
-        while( (keyCode = keypad.keyUpEvent()) == AnalogKeyPad::NO_KEY );
+        keyCode = keypad.waitForKey();
         switch(keyCode)
         {
             case 'L':

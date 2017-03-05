@@ -46,8 +46,8 @@ void setup()
   pinMode(ALARMINDICATORPIN, OUTPUT);
   analogReference(DEFAULT);
 
-  backLightMode = 1;
-  digitalWrite(BACKLIGHTPIN, HIGH);
+  backLightMode = 0;
+  digitalWrite(BACKLIGHTPIN, LOW);
 
   //PID
   setPoint=100;
@@ -115,7 +115,7 @@ void loop()
     }
   }
 
-  if( (temp != tempAnt) && (!showMenuFlag) )
+  if( (temp != tempAnt) && (!showMenuFlag) && (!waitAHitToUpdate))
   {
     printTemp(temp);
     lcd.display();
