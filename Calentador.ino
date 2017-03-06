@@ -30,7 +30,7 @@ extern OvenControl calentador;
 extern double setPoint;
 
 extern bool itsRun;
-extern bool itsCancel;
+extern bool itsStop;
 extern bool waitAHitToUpdate;
 
 void printPrincipal();
@@ -78,7 +78,7 @@ void loop()
   temp = calentador.getActualTemperature();
 
   //PID
-  if (millis() > nextCheck && itsRun && !itsCancel)
+  if (millis() > nextCheck && itsRun && !itsStop)
   {
     nextCheck += 50;
     //Serial.println(temp);
@@ -95,8 +95,7 @@ void loop()
       //Serial.println("Dentrol del rango");
       calentador.stop();
     }
-  }
-  //FIN PID
+  }//FIN PID
 
   if( alarmEnabled )
   {
@@ -121,9 +120,9 @@ void loop()
     lcd.display();
   }
 
-  if( (!isBacklightOn) && (backLightMode==2) )
+  if( (!isBacklightOn) && (backLightMode==2) )  // Si esta apagado, modo auto y mostrando temps
   {
-    if( keypad.keyUpEvent() != AnalogKeyPad::NO_KEY )    // Si esta apagado, modo auto y mostrando temps
+    if( keypad.keyUpEvent() != AnalogKeyPad::NO_KEY )
     {
       counter = millis();
       digitalWrite(BACKLIGHTPIN, HIGH);
@@ -140,7 +139,7 @@ void loop()
         {
           if(backLightMode==2)
             counter = millis();
-          if( (keypad.getCurrentKey() == AnalogKeyPad::UP ) && !itsCancel )
+          if( (keypad.getCurrentKey() == AnalogKeyPad::UP ) && !itsStop )
           {
             runPauseProcess();
             printPrincipal();
@@ -240,7 +239,7 @@ void printPrincipal()
     lcd.setTextSize(1);
     lcd.setTextColor(BLACK, WHITE);
 
-    if( !itsCancel )
+    if( !itsStop )
     {
       lcd.print("Setpoint= ");
       lcd.print((uint16_t)setPoint);

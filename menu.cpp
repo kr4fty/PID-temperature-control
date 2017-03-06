@@ -137,7 +137,7 @@ double Kp=KP, Ki=KI, Kd=KD;
 OvenControl calentador = OvenControl(THERMOCOUPLEPIN, ZEROCROSSPIN, PWMOUTPUTPIN);
 
 bool itsRun= false;
-bool itsCancel= true;
+bool itsStop= true;
 bool waitAHitToUpdate= false;
 
 void backLightOnFun()
@@ -231,26 +231,24 @@ void setSetpoint()
     lcd.display();
 
     itsRun = true;
-    itsCancel = false;
+    itsStop = false;
 }
 void runProcess(bool run_status)
 {
     itsRun = run_status;
     calentador.setTurnOnHeater(run_status);
-    itsCancel = false;
+    itsStop = false;
 }
 void runPauseProcess()
 {
-  if(itsRun){
+  if(itsRun)
     runProcess(false);
-  }
-  else{
+  else
     runProcess(true);
-  }
 }
 void cancelProcess()
 {
-    itsCancel = true;
+    itsStop = true;
     itsRun = false;
     calentador.setTurnOnHeater(false);
 }
