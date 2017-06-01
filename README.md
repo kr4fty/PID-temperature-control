@@ -27,7 +27,7 @@ The system is composed of five main parts
 * **AC control**: in charge of handling AC, in this case I will use 220Vac/50Hz. For this purpose opto-thyristors are used, which act as a solid state relay.
 * **Zero crossing detector**: in charge of activating the thyristors from the moment in which the alternating voltage wave is detected crosses by zero.For this function a K-type thermocouple is used.
 
-![alt tag](https://github.com/kr4fty/PID-temperature-control/blob/master/Eagle%20PCB/circuit.png)
+![alt tag](https://github.com/kr4fty/PID-temperature-control/blob/master/hardware/circuit.png)
 
 ## Video
 [![Oven Control](https://img.youtube.com/vi/Dz5Lqh4SREI/0.jpg)](https://www.youtube.com/watch?v=Dz5Lqh4SREI "PID Oven Control")
