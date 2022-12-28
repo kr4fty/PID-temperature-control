@@ -1,9 +1,9 @@
 # PID-temperature-control
 
-Oven/heater temperature control made with an Arduino Uno (atmega328p microcontroller).
-For the same it is used a PID controller which will provide to the output a constant temperature of acuardo to the set by the user.
+Temperature control of an oven/heater made with Arduino Uno (atmega328p microcontroller).
+For it, a PID controller is used which will provide a constant temperature at the outlet, according to that established by the user.
 
-This is an implementation of the ovenControl library for Arduino boards
+This is an implementation of the ovenControl library for Arduino boards.
 
 ## Description:
 The system maintains a constant temperature at which it is selected. It can vary between 0 and 420ºC.
